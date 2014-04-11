@@ -262,6 +262,36 @@ class SimpleConsumer(Consumer):
         """
         self.partition_info = True
 
+    def reset_offsets(self, offsets={}):
+        """
+        Set the current offsets to be the provided offsets
+
+        offsets = {
+            0: 10,
+            1: 12
+            ...
+        }
+
+        self.offsets = {
+            0: 50,
+            ...
+        }
+
+        Result:
+        self.offsets = {
+            0: 10,
+            ...
+        }
+        """
+        if offsets:
+            for partition, offset in offsets.items():
+                if partition in self.offsets:
+                    self.offsets[partition] = offset
+
+            self.fetch_offsets = self.offsets.copy()
+            self.count_since_commit += 1
+            self.commit()
+
     def seek(self, offset, whence):
         """
         Alter the current offset in the consumer, similar to fseek
